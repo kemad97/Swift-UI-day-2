@@ -8,15 +8,30 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var viewModel = ShoppingListViewModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            VStack {
+               
+                TextField("Item", text: $viewModel.newItem)
+                    .padding()
+                    
+                List(viewModel.itemsList, id: \.self) { item in
+                    Text(item)
+                }.padding()
+            }
+            .navigationTitle("Shopping List")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Add") {
+                        viewModel.addItem()
+                    }
+                }
+            }
         }
-        .padding()
     }
+    
 }
 
 #Preview {
