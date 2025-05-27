@@ -19,6 +19,10 @@ class ShoppingListViewModel : ObservableObject {
             newItem=""
         }
     }
+    
+    func deleteItem(at offsets : IndexSet){
+        itemsList.remove(atOffsets: offsets)
+    }
 }
 
 

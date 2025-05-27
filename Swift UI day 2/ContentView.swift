@@ -13,14 +13,17 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
-               
                 TextField("Item", text: $viewModel.newItem)
                     .padding()
-                    
-                List(viewModel.itemsList, id: \.self) { item in
-                    Text(item)
+                
+                List {
+                    ForEach(viewModel.itemsList, id: \.self) { item in
+                        Text(item)
+                    }
+                    .onDelete(perform: viewModel.deleteItem)
                 }.padding()
             }
+            
             .navigationTitle("Shopping List")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -31,9 +34,7 @@ struct ContentView: View {
             }
         }
     }
-    
 }
-
 #Preview {
     ContentView()
 }
