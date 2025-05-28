@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
+
 
 struct LandmarkGridView: View {
-    
-    @State var landmarks:[Landmark] = loadLandmarks()
+    @Environment(\.modelContext) private var modelContext
+
+    @Query private var landmarks: [Landmark]
     @State var showAlert = false
     @State var landmarkToDelete : Landmark?
     
@@ -65,8 +68,8 @@ struct LandmarkGridView: View {
     
     
     func deleteLandmark(_ landmark: Landmark) {
-        landmarks.removeAll { $0.id == landmark.id }
-        
+        modelContext.delete(landmark)
+
     }
 }
 

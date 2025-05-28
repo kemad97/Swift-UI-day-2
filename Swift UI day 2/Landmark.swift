@@ -6,9 +6,18 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Landmark: Codable, Identifiable {
+
+@Model
+final class Landmark {
     var id: Int
     var name: String
     var imageName: String
+    
+    init(id: Int, name: String, imageName: String) {
+        self.id = id
+        self.name = name
+        self.imageName = imageName
+    }
 }
