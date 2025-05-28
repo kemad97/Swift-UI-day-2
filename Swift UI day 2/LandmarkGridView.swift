@@ -9,12 +9,13 @@ import SwiftUI
 
 struct LandmarkGridView: View {
     
-    let landmarks:[Landmark] = loadLandmarks()
+    @State var landmarks:[Landmark] = loadLandmarks()
+    @State var showAlert = false
+    @State var landmarkToDelete : Landmark?
     
     let columns = [
-        GridItem(.adaptive(minimum: 100)),
-        GridItem(.adaptive(minimum: 100))
-        
+        GridItem(.flexible()),
+        GridItem(.flexible() )
     ]
     
     var body: some View {
@@ -27,9 +28,21 @@ struct LandmarkGridView: View {
                                 .resizable()
                                 .frame(width: 150, height: 150)
                                 .aspectRatio(contentMode: .fit)
+                                .cornerRadius(10)
                             
                             Text(landmark.name)
                                 .padding(.top,4)
+                            
+                            Button(action : {
+                                landmarkToDelete = landmark
+                                showAlert = true
+                                
+                            }){
+                                Image(systemName: "trash.fill")
+                                    .foregroundColor(.red)
+                                    .background(Circle().fill(Color.white))
+                                    .font(.title2)
+                            }
                         }
                     }
                 }
@@ -38,10 +51,23 @@ struct LandmarkGridView: View {
             
         }
         .navigationTitle("LandMarks")
+        .alert("Delete Landmark", isPresented: $showAlert) {
+                        Button("Cancel", role: .cancel) { }
+                        Button("Delete", role: .destructive) {
+                            if let landmark = landmarkToDelete {
+                                deleteLandmark(landmark)
+                            }
+                        }
+                    } message: {
+                        Text("Are you sure to delete \(landmarkToDelete?.name)?")
+                    }
     }
     
     
-    
+    func deleteLandmark(_ landmark: Landmark) {
+        landmarks.removeAll { $0.id == landmark.id }
+        
+    }
 }
 
 
