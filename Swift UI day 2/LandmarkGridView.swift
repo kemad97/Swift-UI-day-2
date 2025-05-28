@@ -11,10 +11,13 @@ import SwiftData
 
 struct LandmarkGridView: View {
     @Environment(\.modelContext) private var modelContext
-
+    
     @Query private var landmarks: [Landmark]
     @State var showAlert = false
     @State var landmarkToDelete : Landmark?
+    
+    @State var editingLandmarkId: Int? = nil
+    @State var editedImageName: String = ""
     
     let columns = [
         GridItem(.flexible()),
@@ -36,15 +39,44 @@ struct LandmarkGridView: View {
                             Text(landmark.name)
                                 .padding(.top,4)
                             
-                            Button(action : {
-                                landmarkToDelete = landmark
-                                showAlert = true
+                            if (editingLandmarkId == landmark.id){
+                                HStack{
+                                    TextField("Image Name", text: $editedImageName)
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        .frame(width: 120)
+                                    Button(action: {
+                                        landmark.name = editedImageName
+                                        editingLandmarkId = nil
+                                    }){
+                                        Image(systemName: "checkmark.circle.fill")
+                                    }
+                                    
+                                    
+                                }
+                            }
+                           
+                            HStack {
                                 
-                            }){
-                                Image(systemName: "trash.fill")
-                                    .foregroundColor(.red)
-                                    .background(Circle().fill(Color.white))
-                                    .font(.title2)
+                                // Edit button
+                                Button(action: {
+                                    editingLandmarkId = landmark.id
+                                    editedImageName = landmark.imageName
+                                }) {
+                                    Image(systemName: "pencil.circle.fill")
+                                }
+                                
+                                
+                                // Delete button
+                                Button(action : {
+                                    landmarkToDelete = landmark
+                                    showAlert = true
+                                    
+                                }){
+                                    Image(systemName: "trash.fill")
+                                        .foregroundColor(.red)
+                                        .background(Circle().fill(Color.white))
+                                        .font(.title2)
+                                }
                             }
                         }
                     }
@@ -55,21 +87,48 @@ struct LandmarkGridView: View {
         }
         .navigationTitle("LandMarks")
         .alert("Delete Landmark", isPresented: $showAlert) {
-                        Button("Cancel", role: .cancel) { }
-                        Button("Delete", role: .destructive) {
-                            if let landmark = landmarkToDelete {
-                                deleteLandmark(landmark)
-                            }
-                        }
-                    } message: {
-                        Text("Are you sure to delete \(landmarkToDelete?.name)?")
-                    }
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                if let landmark = landmarkToDelete {
+                    deleteLandmark(landmark)
+                }
+            }
+        } message: {
+            Text("Are you sure to delete \(landmarkToDelete?.name)?")
+        }
+        .onAppear {
+            if landmarks.isEmpty {
+                addDummyData()
+            }
+            
+        }
     }
     
     
     func deleteLandmark(_ landmark: Landmark) {
         modelContext.delete(landmark)
+        
+    }
+    
+    
+    
+    func addDummyData() {
+        let dummyLandmarks = [
+            Landmark(id: 1, name: "silversalmoncreekk", imageName: "silversalmoncreek"),
+            Landmark(id: 2, name: "silversalmoncreekk", imageName: "silversalmoncreek"),
 
+            Landmark(id: 3, name: "silversalmoncreekk", imageName: "silversalmoncreek"),
+
+            Landmark(id: 4, name: "silversalmoncreekk", imageName: "silversalmoncreek"),
+
+            Landmark(id: 5, name: "silversalmoncreekk", imageName: "silversalmoncreek"),
+            
+            
+        ]
+        
+        for landmark in dummyLandmarks {
+            modelContext.insert(landmark)
+        }
     }
 }
 
@@ -77,16 +136,6 @@ struct LandmarkGridView: View {
 
 
 
-func loadLandmarks() -> [Landmark]{
-    guard let url = Bundle.main.url(forResource: "landmarkData", withExtension: "json"),
-          let data = try? Data(contentsOf: url),
-          let landmarks = try? JSONDecoder().decode([Landmark].self, from: data) else {
-        return []
-    }
-    
-    return landmarks
-    
-}
 
 #Preview {
     LandmarkGridView()
